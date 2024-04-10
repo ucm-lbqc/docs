@@ -1,0 +1,83 @@
+- home
+- about
+- team
+- docs
+  - home
+  - getting-started
+    - What is Slurm?
+    - Connecting to LBQC
+    - Your First Job
+    - Data Backup
+    - Other Resources
+    - Submitting Interactive Jobs
+  - cluster
+    - Login & compute nodes
+    - Hardware
+  - accounts
+    - Requesting an account
+  - access
+    - VPN
+    - SSH
+      - SSH customization
+        - SSH alias
+        - SSH session timeout
+      - Passwordless connection
+  - storage
+    - Distributed storage
+      - NFS node (home & opt)
+      - NAS
+      - Scratch
+    - File organization
+    - Quota
+    - sync
+      - scp
+      - rsync
+  - software
+    - modules
+      - Lmod
+      - List available modules
+      - Load module
+      - Unload module
+    - organization
+      - Toolchains
+      - Categories
+    - user-software
+  - resource-management
+    - slurm
+      - What is SLURM?
+      - Partitions
+      - QoS
+      - Notification system
+      - Scheduling
+        - Priority
+        - Aging
+    - job-submission
+      - Resource allocation
+        - sbatch
+          - Job script
+          - Options
+            - Email notification
+          - Features
+          - salloc
+          - srun
+        - Parallel jobs
+          - WARNING: one node!
+          - Affinity
+            - bind-to core
+            - omp variables
+        - GPUs
+        - Environment variables
+      - Best practices
+      - Examples
+        - Serial
+        - MPI
+        - GPU
+    - job-management
+      - squeue
+      - sinfo
+      - scontrol
+      - sacct
+      - scancel
+      - Loggin into compute node
+    - job-interactive
+    - troubleshooting

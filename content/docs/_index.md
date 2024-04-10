@@ -1,6 +1,6 @@
 ---
-title: Documentation
-next: first-page
+title: LBQC technical documentation
+next: getting-started
 ---
 
 This is a demo of the theme's documentation layout.
