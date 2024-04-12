@@ -4,14 +4,14 @@ next: storage
 weight: 400
 ---
 
-## VPN
-
 ## SSH
 
-## SSH customization
+### Customization
 
 #### SSH alias
 
 #### SSH session timeout
 
 ### Passwordless connection
+
+## Remote access

@@ -31,8 +31,6 @@ WARNING: one node!
 
 ### Environment variables
 
-## Best practices
-
 ## Examples
 
 ### Serial
