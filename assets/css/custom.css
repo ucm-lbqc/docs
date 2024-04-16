@@ -1,0 +1,5 @@
+.content :where(table):not(:where(.code-block table, [class~="not-prose"], [class~="not-prose"] *)) {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
