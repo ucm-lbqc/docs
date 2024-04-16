@@ -228,6 +228,13 @@ Currently Loaded Modules:
 
 Note that there are a lot of extra packages, such as the compiler libraries used during compilation (`intel/2023.1.0`) of one or more packages, which are automatically loaded based on the dependencies specified in the corresponding modules.
 
+{{< callout type="info" >}}
+**Module scope**
+<br />
+The modules you load are only active in your current session.
+Therefore, you need to load the desired software each time you open a new session.
+{{< /callout >}}
+
 ## Your first job
 
 ## Data backup
