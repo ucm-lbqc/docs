@@ -52,12 +52,10 @@ The login node must be only used for job-related (see below) and simple tasks.
 Bad usage will lead to account termination.
 {{< /callout >}}
 
-See the [Accessing the server]({{< ref access >}}) page for details about how to configure the connection via SSH and some useful tips.
-
-{{< callout type="info" >}}
 If you want to connect from a remote location (e.g., from your computer at home), you must use a VPN connection to get access to the university's network.
 Follow the steps in the [Remote access]({{< ref "access#remote-access" >}}) section to install and configure the VPN in your computer.
-{{< /callout >}}
+
+See the [Accessing the server]({{< ref access >}}) page for details about how to configure the connection via SSH and some useful tips.
 
 ## Managing files
 
