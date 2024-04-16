@@ -6,7 +6,7 @@ weight: 400
 
 ## SSH
 
-### Customization
+### Customization {#ssh-customization}
 
 #### SSH alias
 
