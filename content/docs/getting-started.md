@@ -70,7 +70,7 @@ The cluster has access to three file systems with different levels of performanc
    This directory has limited capacity, so be sure to keep your home directory clean by regularly deleting old data.
    It can be referenced by the `$HOME` environment variable or the `~` shorthand in a path.
 2. The **data directory** (`/data/$USER`) is used to store your important and long-term data.
-   It is backed up regularly and it has 1 TB of capacity.
+   It is backed up regularly, and it has 1 TB of capacity.
    It can be referenced by the `$DATA_DIR` environment variable.
 3. The **scratch directory** (`/scratch/$USER`) is used to store temporary files generated when running a job.
    This folder is stored in a physical disk on the compute nodes (unlike the HOME and data directories) so it is much faster for reading and writing files than the shared file system over the network.
@@ -118,11 +118,11 @@ $ scp -r /path/to/local-dir <user>@192.168.57.68:path/to/remote-dir
 $ scp -r <user>@192.168.57.68:path/to/remote-dir /path/to/local-dir
 ```
 
-These commands must be entered in a terminal in your local computer running a UNIX-like OS like Linux or MacOS.
+These commands must be entered in a terminal in your local computer running a UNIX-like OS like Linux or macOS.
 It is recommended to use the [Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/install) under Windows rather than installing third-party applications, if possible.
 
 {{< callout type="warning" >}}
-The path follwing the colon after the remote address is relative to the HOME directory unless is prefixed by `/`, which it is treated as an absolute path instead.
+The path following the colon after the remote address is relative to the HOME directory unless is prefixed by `/`, which it is treated as an absolute path instead.
 That is, `/path/to/file` points to the file at `/path/to/file`, whereas `path/to/file` points to `$HOME/path/to/file`.
 {{< /callout >}}
 
