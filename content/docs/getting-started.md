@@ -137,6 +137,8 @@ You can use pre-installed software, build your own software, or submit a softwar
 Here we will focus on using pre-installed software only.
 Refer to the [Building software]({{< ref "software#building" >}}) and [Request a software]({{< ref "software#request" >}}) sections for information in these topics.
 
+### Finding a software package
+
 There are many programs pre-installed in the server.
 We use the [Environment Module](https://modules.readthedocs.io/en/latest/) system to manage software packages including different versions and dependencies.
 To get a list of all provided packages, run the following command:
@@ -188,6 +190,8 @@ $ module avail namd
 ```
 
 Here we can see that there are three variants of NAMD, two different versions and two variants support GPU acceleration.
+
+### Loading modules
 
 Once the desired software variant is identified, let's select `md/namd/2.14+cuda` for this example, you must load the corresponding module to set up the environment and software dependencies:
 
