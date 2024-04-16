@@ -64,7 +64,7 @@ Here is a brief summary about the directories available to you and quick example
 
 ### Directory structure
 
-In a nutshell, the cluster has a directory structure consisting of three levels:
+The cluster has access to three file systems with different levels of performance, lifetime and available space:
 
 1. The **HOME directory** (`/home/$USER` where `$USER` is your account's username) is used to store your personal files and configurations.
    This directory has limited capacity, so be sure to keep your home directory clean by regularly deleting old data.
@@ -76,11 +76,13 @@ In a nutshell, the cluster has a directory structure consisting of three levels:
    This folder is stored in a physical disk on the compute nodes (unlike the HOME and data directories) so it is much faster for reading and writing files than the shared file system over the network.
    It can be referenced by the `$SCRATCH_DIR` environment variable.
 
-| Name | Speed | Capacity         | Backup |
-| ---- | ----- | ---------------- | ------ |
-| HOME | slow  | small (a few GB) | ❌     |
-| HOME | slow  | small (a few GB) | ❌     |
-| HOME | slow  | small (a few GB) | ❌     |
+Here is a summary table of the directory features:
+
+| Directory | Speed | Capacity      | Lifetime   | Backup |
+| --------- | ----- | ------------- | ---------- | :----: |
+| HOME      | slow  | 100 GB        | 6 months   |   ❌   |
+| data      | slow  | 1 TB          | Indefinite |   ✔️   |
+| scratch   | fast  | 1 TB (shared) | A week     |   ❌   |
 
 Refer to the [Storage]({{< ref storage >}}) and [Best practices]({{< ref best-practices >}}) pages for more information about how to correctly use the file system.
 
