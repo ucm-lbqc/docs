@@ -42,7 +42,7 @@ Refer to the [Best practices]() page for more information about how to correctly
 
 ## Quota
 
-## sync
+## File transfer
 
 ### scp
 
