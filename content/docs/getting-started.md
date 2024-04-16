@@ -239,12 +239,116 @@ The modules you load are only active in your current session.
 Therefore, you need to load the desired software each time you open a new session.
 {{< /callout >}}
 
-## Your first job
+## Running jobs
 
-## Data backup
+The cluster has several compute nodes aimed at running resource-intensive tasks.
+These are managed the [Slurm](https://slurm.schedmd.com/) workload manager, which takes care of allocating and scheduling the compute resources among the users.
+Hence, the users must submit jobs to the compute nodes for processing via the Slurm scheduler.
 
-## Other resources
+Job submission is commonly done in two steps:
 
-## Submitting interactive jobs
+1. Write a job script file.
+2. Submit the job file to the scheduler.
+
+A job script file is simply a Bash script with special instructions written as comments at the top of the file.
+Such instructions tell the scheduler the resources (e.g., CPUs and memory) that the job requires to be run, so it can be assigned to a compatible compute node, how long the job will run, etc.
+The body of the script consists of shell commands to be executed in order, usually setting up the environment, copying files, and running the desired software.
+
+{{< callout type="info" >}}
+Refer to tutorials on the internet for learning the basics of the Bash language.
+{{< /callout >}}
+
+### Writing a job
+
+As an example, let's write a simple job file (`example.slurm`) that loads a software, lists the loaded modules, and then prints some information to standard output.
+
+```bash {linenos=table, filename="example.slurm"}
+#!/bin/bash
+#SBATCH -c 8
+#SBATCH -t 00:00:05
+echo "This is job $SLURM_JOB_ID running at $SLURM_JOB_NODELIST"
+echo "It was submitted from $SLURM_SUBMIT_DIR"
+module load md/namd/2.14+cuda
+module list
+which namd2
+sleep 4m
+```
+
+The content of the script may be divided in three parts:
+
+- Line 1 is termed as [shebang](<https://en.wikipedia.org/wiki/Shebang_(Unix)>), which tells Linux how to execute the file.
+  Here we're saying that this is a standard Bash file.
+- Lines 2--3 are Slurm directives that specify the resources for this job.
+  There are tons of options to tinker with, but here we're just requesting a node with 8 CPUs (the `-c` or `--cpus-per-task` option) for 5 minutes (the `-t` or `--time` option).
+- Lines 4--8 are commands that print some information about the job, load a module, list the loaded modules, and show the executable path of a program.
+  Note that we have access to several Slurm environment variables (starting with `$SLURM_`) within the script, which provide useful information about the job and the allocated resources.
+- Line 9 delays the job termination for 4 minutes, otherwise it will end immediately.
+
+### Submitting a job
+
+We may now submit the job script to the Slurm scheduler, which will then provide the requested resources by allocating one of the available compute nodes to the job as soon as possible.
+That is, if none of the available nodes matches the requested resources, the job will wait until enough resources are available.
+
+A job is submitted to the scheduler using the `sbatch` command:
+
+```console
+$ sbatch example.slurm
+Submitted batch job 238
+```
+
+If the job is submitted successfully, the command outputs a job ID that can be used for monitoring, early termination, and other actions.
+Otherwise, an error will be printed explaining the reason of failure, e.g., one or more Slurm directives are incorrect, or an unknown resource was requested.
+For instance, requesting 256 cores (`#SBATCH -n 256`) results in:
+
+```console
+$ sbatch example.slurm
+sbatch: error: CPU count per node can not be satisfied
+sbatch: error: Batch job submission failed: Requested node configuration is not available
+```
+
+### Monitoring a job
+
+The status of an active job can be inspected with the `squeue` command:
+
+```console
+$ squeue -j 238
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+               238    normal example.  fadasme  R       2:35      1 rose
+```
+
+The selected job was named `example.slurm`, and it's running (R under the ST column) in the "normal" partition (default partition) on the node rose for about 2:35 minutes.
+When the job cannot be started immediately, the output would look like this:
+
+```console
+$ squeue -j 241
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+               241    normal example.  fadasme PD       1:23      1 (Resources)
+```
+
+Note that the state is pending (PD), where the last column shows the reason why the job is pending.
+In this example, the job has to wait for the requested resources to be available (indicated by the `(Resources)` text) and it has been waiting for 1:23 minutes.
+Check a list of the most common reasons for a job to be pending in the [Job Management]({{< ref job-management >}}) page.
+
+Note that running `squeue` without any option will list of active jobs, either running or pending.
+List only your jobs by running:
+
+```console
+$ squeue -u $(whoami)
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+               238    normal example.  fadasme  R       2:35      1 rose
+               239    normal example.  fadasme  R       0:06      1 rose
+               240    normal example.  fadasme  R       0:03      1 rose
+               241    normal example.  fadasme PD       0:00      1 (Resources)
+```
+
+### Checking the output
+
+...
+
+### A real example
+
+...
+
+## What's next?
 
 [^1]: Strictly speaking, you should copy the input files to the local scratch to improve performance.
