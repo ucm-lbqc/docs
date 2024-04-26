@@ -479,4 +479,8 @@ $ squeue
 
 ## What's next?
 
+- See the [Resources]({{< ref "cluster#hardware" >}}) section for information about the available resources.
+- See the [Job submission]({{< ref job-submission >}}) page for a detailed description about how to use the Slurm scheduler and all the options available to specify the job resource requirements.
+- Check out the [Best practices]({{< ref best-practices >}}) page for getting out the most of the computing resources.
+
 [^1]: Strictly speaking, you should copy the input files to the local scratch to improve performance.
