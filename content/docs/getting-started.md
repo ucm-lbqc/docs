@@ -388,6 +388,95 @@ One can define two different files for each output stream by adding the `-e <fil
 ...
 ```
 
+## A real example
+
+Let's say we want to run a molecular dynamics (MD) simulation of a protein (PDB ID 5EWJ).
+First we must look for the available software for MD:
+
+```console
+$ module category
+---------------------------------------------------- List of Categories -----------------------------------------------------
+compiler           language  molecular-dynamics  python module      resource manager tools  runtime support  utility
+developer support  library   molecular-modeling  quantum-mechanics  runtime library         system tool
+$ module category molecular-dynamics
+--------------------------------------------------- molecular-dynamics ----------------------------------------------------
+md/charmm (2)   md/desmond (1)   md/gromacs (1)   md/namd (3)   mm/schrodinger (1)
+$ module avail md/gromacs
+------------------------------------------------- /opt/ohpc/pub/modulefiles -------------------------------------------------
+   md/gromacs/2024.1+cuda
+$ module whatis md/gromacs/2024.1+cuda
+md/gromacs/2024.1+cuda                        : Name: gromacs
+md/gromacs/2024.1+cuda                        : Version: 2024.1
+md/gromacs/2024.1+cuda                        : Category: molecular-dynamics
+md/gromacs/2024.1+cuda                        : Description: A free and open-source software suite for high-performance molecular dynamics and output analysis.
+md/gromacs/2024.1+cuda                        : URL: https://www.gromacs.org
+$ module help md/gromacs/2024.1+cuda
+
+------------------------------------- Module Specific Help for "md/gromacs/2024.1+cuda" -------------------------------------
+This module loads the GROMACS molecular simulation package with support for CUDA.
+
+Version 2024.1
+```
+
+The commands above did the following:
+
+1. List all categories to look for molecular dynamics.
+2. List the available software packages for molecular dynamics.
+3. List the available versions for Gromacs (the chosen software for this example).
+4. Show the description and information about the chosen software variant.
+
+Once we selected the right software, we must create a job script to be submitted to the Slurm scheduler.
+Here is an example script following best practices:
+
+```bash {filename=gromacs.slurm}
+#!/bin/bash
+#SBATCH -J gmx_prot_5ewj
+#SBATCH -c 8
+#SBATCH -t 12:00:00
+#SBATCH -o %x.out
+#SBATCH --gpus=2080ti:1
+#SBATCH --mail-user=user@email.com
+#SBATCH --mail-type=ALL
+
+WORKDIR=$SCRATCH_DIR/${SLURM_JOB_ID}_${SLURM_JOB_NAME}
+
+module load prun
+module load md/gromacs/2024.1+cuda
+
+mkdir -p $WORKDIR || exit 1
+cd $WORKDIR || exit 1
+cp $SLURM_SUBMIT_DIR/prot_5ewj.tpr . || exit 1
+
+prun gmx mdrun -nt $SLURM_CPUS_PER_TASK -deffnm prot_5ewj
+exit_code=$?
+
+mv * $SLURM_SUBMIT_DIR
+rm -r $WORKDIR
+
+exit $exit_code
+```
+
+There are several elements to highlight:
+
+- We are asking for a particular GPU model to ensure a certain compute capability.
+  We can just ask for the number of GPUs (`--gpus=1`), but the scheduler will assign the first available one.
+  As the software's performance is heavily dependent on the GPU, the job may take too long to finish.
+- The time limit is set to the estimated time that the job will take with the requested resources.
+  This knowledge may come from experience or previous tests.
+- We are enabling mail notifications (sent to the entered email address) when the job starts and finishes, or fails.
+- We're using the scratch directory to avoid reading/writing temporary files via the network, which is very slow and discouraged.
+- We're returning the exit code of the main command (Gromacs's mdrun) at the end to correctly tell the scheduler whether the job succeeded or failed.
+
+Lastly, we submit the job and check its status:
+
+```console
+$ sbatch gromacs.slurm
+Submitted batch job 247
+$ squeue
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+               247    normal gmx_prot  fadasme  R       1:35      1 wc01
+```
+
 ## What's next?
 
 [^1]: Strictly speaking, you should copy the input files to the local scratch to improve performance.
