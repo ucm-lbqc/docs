@@ -20,7 +20,7 @@ Users with access to the LBQC's resources are either official members of the LBQ
 To request an account, you must ask a LBQC member to request an account for you to the administrator.
 Once the account request is submitted, the administrator will review the request and then contact you within 1--7 business days.
 
-See the [Accounts]({{< relref "access" >}}) for more details.
+See the [Accounts]({{< relref "accounts" >}}) for more details.
 
 ## Accessing the cluster
 
