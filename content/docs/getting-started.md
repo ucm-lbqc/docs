@@ -268,9 +268,9 @@ As an example, let's write a simple job file (`example.slurm`) that loads a soft
 #SBATCH -t 00:00:05
 echo "This is job $SLURM_JOB_ID running at $SLURM_JOB_NODELIST"
 echo "It was submitted from $SLURM_SUBMIT_DIR"
-module load md/namd/2.14+cuda
+module load md/gromacs/2024.1+cuda
 module list
-which namd2
+which gmx
 sleep 4m
 ```
 
@@ -343,11 +343,50 @@ $ squeue -u $(whoami)
 
 ### Checking the output
 
-...
+By default, the output of the job is written to a file named `slurm-<jobid>.out`, where `<jobid>` is the job ID assigned to the job.
+Let's check its contents:
 
-### A real example
+```console
+$ cat slurm-238.out
+This is job 238 running at rose
+It was submitted from /home/fadasme
 
+Currently Loaded Modules:
+  1) gnu12/12.2.0   3) ucx/1.14.0         5) openmpi4/4.1.5   7) md/gromacs/2024.1+cuda
+  2) hwloc/2.9.0    4) libfabric/1.18.0   6) cuda/12.3.2
+
+/opt/ohpc/pub/apps/md/gromacs/2024.1+cuda/bin/gmx
+```
+
+See that the first two lines corresponds to the output of the print statements in our script, containing the values of the Slurm environment variables associated with the job ID, selected nodes, and directory where the job was submitted from.
+Next is displayed the list of the loaded modules and the path to the Gromacs executable, demonstrating that the software package was correctly loaded (see that dependencies were also loaded).
+
+You can change the output file by setting the `-o <filename>` or `--output=<filename>` option in the header.
+For instance, let's change it to `example-<jobid>.out`:
+
+```bash {filename=example.slurm}
+#!/bin/bash
+#SBATCH -c 8
+#SBATCH -t 00:00:05
+#SBATCH -o example-%j.out
 ...
+```
+
+The symbol `%j` refers to the job ID, but there are other symbols that can be used in the filename.
+One useful symbol is `%x`, which is replaced by the job's name.
+See the [Filename pattern](https://slurm.schedmd.com/sbatch.html#SECTION_%3CB%3Efilename-pattern%3C/B%3E) section in the sbatch documentation.
+
+The output file will contain both the standard and error streams by default.
+One can define two different files for each output stream by adding the `-e <filename>` or `--error=<filename>` option:
+
+```bash {filename=example.slurm}
+#!/bin/bash
+#SBATCH -c 8
+#SBATCH -t 00:00:05
+#SBATCH -o example-%j.out
+#SBATCH -e example-%j.err
+...
+```
 
 ## What's next?
 
