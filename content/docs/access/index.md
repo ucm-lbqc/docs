@@ -33,7 +33,7 @@ See the [Accounts page]({{% ref "accounts" %}}) for details.
 {{< /callout >}}
 
 The IP address is a numerical label in the format `XXX.XXX.XXX.XXX` that identifies a device connected to a computer network.
-The IP address of the LBQC server is **192.168.67.54**.
+The IP address of the LBQC server is **{{% data "server.ip" %}}**.
 To avoid typing the IP address, see the [host aliases]({{% ref "#host-aliases" %}}) section.
 
 ## SSH Configuration
