@@ -358,7 +358,7 @@ Note that running `squeue` without any option will list of active jobs, either r
 List only your jobs by running:
 
 ```console
-$ squeue -u $(whoami)
+$ squeue --me
              JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
                238    normal example.  fadasme  R       2:35      1 rose
                239    normal example.  fadasme  R       0:06      1 rose
