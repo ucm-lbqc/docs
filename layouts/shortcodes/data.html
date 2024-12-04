@@ -1,0 +1,16 @@
+{{- $map := .Site.Data.globals -}}
+{{- $keys := split (.Get 0) "." -}}
+{{- range $i, $key := $keys -}}
+  {{- if $map -}}
+    {{- $map = index $map $key -}} <!-- Update $map to be the value of the next key -->
+  {{- end -}}
+{{- end -}}
+{{- if $map -}}
+{{- $map -}}
+{{- else -}}
+  <p>
+    <strong style="color: red;">
+      Error: Key "{{(.Get 0)}}" not found in the globals map.
+    </strong>
+  </p>
+{{- end -}}
