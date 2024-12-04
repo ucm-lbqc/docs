@@ -17,8 +17,8 @@ Basic Linux and HPC knowledge is a prerequisite, which can be learned from many 
 
 Users with access to the LBQC's resources are either official members of the LBQC or collaborate with one or more members of the team.
 
-To request an account, you must ask a LBQC member to request an account for you to the administrator.
-Once the account request is submitted, the administrator will review the request and then contact you within 1--7 business days.
+To request an account, you must email the LBQC's director.
+Once the account request is submitted, the request will be reviewed, and then you will be contacted within 1--7 business days.
 
 See the [Accounts]({{< relref "accounts" >}}) for more details.
 
