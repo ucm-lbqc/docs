@@ -1,18 +1,6 @@
 ---
-title: LBQC technical documentation
+title: LBQC documentation
 next: getting-started
 ---
 
-This is a demo of the theme's documentation layout.
-
-## Hello, World!
-
-```go {filename="main.go"}
-package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("Hello, World!")
-}
-```
+Welcome to the technical documentation of the Laboratorio de Bioinformática y Química Computacional (LBQC) at Universidad Católica del Maule, Chile.
