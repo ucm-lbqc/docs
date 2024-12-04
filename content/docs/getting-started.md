@@ -36,8 +36,34 @@ You must enter your password, and then you will be prompted into a login node te
 
 ```console
 $ ssh <user>@{{% data "server.ip" %}}
-...
 <user>@lbqc's password:
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                             Welcome to the cluster                           ║
+║                            _    ______ _____ _____                           ║
+║                           | |   | ___ \  _  /  __ \                          ║
+║                           | |   | |_/ / | | | /  \/                          ║
+║                           | |   | ___ \ | | | |                              ║
+║                           | |___| |_/ | \/' / \__/\                          ║
+║                           \_____|____/ \_/\_\\____/                          ║
+║                                                                              ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Please remember:
+
+- Backup your data periodically. Although you can use the user data
+  folder (/data/<user>), we are not responsible for it.
+- Scratch data (/scratch/<user>) is deleted after a week of being created.
+- Software management via modules: `module avail` and `module load`.
+- For job submissions, use `sbatch` or the job scheduler.
+
+IMPORTANT: Do not run compute-intensive applications in the login node!
+           The login node must be only used for job-related and simple tasks.
+           Bad usage will lead to account termination.
+
+Documentation can be found at https://ucm-lbqc.github.io/docs.
+For technical assistance, please contact the admin at fadasme@ucm.cl.
 
 Last login: Wed Apr 10 16:50:48 2024 from 10.212.134.55
 [<user>@lbqc ~]$
