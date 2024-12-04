@@ -186,7 +186,7 @@ Follow these steps in a terminal:
 
    You should now be able to log in without entering a password.
 
-## Remote access via VPN
+## Remote access {#remote}
 
 To connect to the LBQC server, you need to access to the virtual private network (VPN) of the institution.
 It uses the FortiGate VPN service, which can be accessed via the FortiClient software.
