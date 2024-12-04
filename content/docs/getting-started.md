@@ -28,14 +28,14 @@ To connect to the cluster, you must log in to the **login node** (named _curie_)
 Open a terminal (Terminal/PowerShell) Use the secure shell (SSH) protocol to connect to the login node as follows:
 
 ```console
-$ ssh <user>@192.168.57.68
+$ ssh <user>@192.168.67.54
 ```
 
-where `<user>` is the given user account and `192.168.57.68` is the internal IP address of _curie_.
-You must enter your password and then you will be prompted into a login node terminal:
+where `<user>` is the given user account and `192.168.67.54` is the internal IP address of _curie_.
+You must enter your password, and then you will be prompted into a login node terminal:
 
 ```console
-$ ssh <user>@192.168.57.68
+$ ssh <user>@192.168.67.54
 fadasme@curie's password:
 ...
 
@@ -97,25 +97,25 @@ The following commands show how to copy a file/directory from/to the server.
 **Copy a file to the server**
 
 ```console
-$ scp /path/to/local-file <user>@192.168.57.68:path/to/remote-dir
+$ scp /path/to/local-file <user>@192.168.67.54:path/to/remote-dir
 ```
 
 **Copy a file from the server**
 
 ```console
-$ scp <user>@192.168.57.68:path/to/remote-file /path/to/local-dir
+$ scp <user>@192.168.67.54:path/to/remote-file /path/to/local-dir
 ```
 
 **Copy an entire directory to the server**
 
 ```console
-$ scp -r /path/to/local-dir <user>@192.168.57.68:path/to/remote-dir
+$ scp -r /path/to/local-dir <user>@192.168.67.54:path/to/remote-dir
 ```
 
 **Copy an entire directory from the server**
 
 ```console
-$ scp -r <user>@192.168.57.68:path/to/remote-dir /path/to/local-dir
+$ scp -r <user>@192.168.67.54:path/to/remote-dir /path/to/local-dir
 ```
 
 These commands must be entered in a terminal in your local computer running a UNIX-like OS like Linux or macOS.
