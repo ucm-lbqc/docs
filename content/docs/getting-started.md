@@ -4,13 +4,13 @@ next: cluster
 weight: 100
 ---
 
-This section is intended as a brief introduction into HPC and it will guide you through the basics of using the LBQC's cluster.
+This section is intended as a brief introduction into HPC, and it will guide you through the basics of using the LBQC's cluster.
 You'll learn how to connect to the cluster, list and load modules, submit and manage jobs, and accessing user data.
 After reading this page, you will hopefully have run your first job successfully in the cluster.
 Links are provided throughout the text to point you to more in-depth information on the topic.
 
 {{< callout type="warning" >}}
-Basic Linux and HPC knowledge is a prerequisite, which can be learn from many beginner tutorials available online.
+Basic Linux and HPC knowledge is a prerequisite, which can be learned from many beginner tutorials available online.
 {{< /callout >}}
 
 ## Getting an account
