@@ -457,28 +457,42 @@ Here is an example script following best practices:
 #!/bin/bash
 #SBATCH -J gmx_prot_5ewj
 #SBATCH -c 8
+#SBATCH --gpus=2080ti:1
 #SBATCH -t 12:00:00
 #SBATCH -o %x.out
-#SBATCH --gpus=2080ti:1
-#SBATCH --mail-user=user@email.com
+#SBATCH --mail-user=example@gmail.com
 #SBATCH --mail-type=ALL
+#SBATCH --signal=B:USR1
 
 WORKDIR=$SCRATCH_DIR/${SLURM_JOB_ID}_${SLURM_JOB_NAME}
 
-module load prun
-module load md/gromacs/2024.1+cuda
+backup_files() {
+    mv --update $WORKDIR/* $SLURM_SUBMIT_DIR
+    rm -r $WORKDIR
+    rm -f $JOB_FILE
+}
+
+stop() {
+    echo
+    echo "WARNING: stopping due to time limit. Backing up files..."
+    backup_files
+    echo "Stopped at $(date)"
+    exit 1
+}
+trap 'stop' SIGUSR1 # signal send on time limit
 
 mkdir -p $WORKDIR || exit 1
 cd $WORKDIR || exit 1
 cp $SLURM_SUBMIT_DIR/prot_5ewj.tpr . || exit 1
 
-prun gmx mdrun -nt $SLURM_CPUS_PER_TASK -deffnm prot_5ewj
-exit_code=$?
+module load md/gromacs/2024.1+cuda
+srun gmx mdrun -nt $SLURM_CPUS_PER_TASK -deffnm prot_5ewj &
+wait $!
+retno=$?
 
-mv * $SLURM_SUBMIT_DIR
-rm -r $WORKDIR
+backup_files
 
-exit $exit_code
+exit $retno
 ```
 
 There are several elements to highlight:
@@ -491,6 +505,8 @@ There are several elements to highlight:
 - We are enabling mail notifications (sent to the entered email address) when the job starts and finishes, or fails.
 - We're using the scratch directory to avoid reading/writing temporary files via the network, which is very slow and discouraged.
 - We're returning the exit code of the main command (Gromacs's mdrun) at the end to correctly tell the scheduler whether the job succeeded or failed.
+- Gromacs is run in the background (trailing `&`) to be able to respond to signals from the OS and scheduler.
+- We tell the scheduler to use signal `USR1` to end time, so we capture it, back up the temporary files, and exit gracefully.
 
 Lastly, we submit the job and check its status:
 
