@@ -24,27 +24,26 @@ See the [Accounts]({{< relref "accounts" >}}) for more details.
 
 ## Accessing the cluster
 
-To connect to the cluster, you must log in to the **login node** (named _curie_) from within the university's network.
-Open a terminal (Terminal/PowerShell) Use the secure shell (SSH) protocol to connect to the login node as follows:
+To connect to the cluster, you must log in to the **login node** (named _lbqc_) from within the university's network.
+Open a terminal (Terminal/PowerShell) and use the secure shell (SSH) protocol to connect to the login node as follows:
 
 ```console
 $ ssh <user>@{{% data "server.ip" %}}
 ```
 
-where `<user>` is the given user account and `{{% data "server.ip" %}}` is the internal IP address of _curie_.
+where `<user>` is the given user login and `{{% data "server.ip" %}}` is the internal IP address of _lbqc_.
 You must enter your password, and then you will be prompted into a login node terminal:
 
 ```console
 $ ssh <user>@{{% data "server.ip" %}}
-fadasme@curie's password:
 ...
+<user>@lbqc's password:
 
 Last login: Wed Apr 10 16:50:48 2024 from 10.212.134.55
-[<user>@curie ~]$ hostname
-curie
+[<user>@lbqc ~]$
 ```
 
-Here you can execute commands within _curie_ such as submitting and managing jobs.
+Here you can execute commands within _lbqc_ such as submitting and managing jobs.
 
 {{< callout type="warning" >}}
 **Do not run compute-intensive applications from here**.
