@@ -19,7 +19,7 @@ Users with access to the LBQC's resources are either official members of the LBQ
 To request an account, you must email the LBQC's director.
 Once the account request is submitted, the request will be reviewed, and then you will be contacted within 1--7 business days.
 
-See the [Accounts]({{< relref "accounts" >}}) for more details.
+See [Accounts]({{< relref "accounts" >}}) for more details.
 
 ## Accessing the cluster
 
@@ -92,9 +92,9 @@ The cluster has access to three file systems with different levels of performanc
 1. The **HOME directory** (`/home/$USER` where `$USER` is your account's username) is used to store your personal files and configurations.
    This directory has limited capacity, so be sure to keep your home directory clean by regularly deleting old data.
    It can be referenced by the `$HOME` environment variable or the `~` shorthand in a path.
-2. The **data directory** (`/data/$USER`) is used to store your important and long-term data.
-   It is backed up regularly, and it has 1 TB of capacity.
-   It can be referenced by the `$DATA_DIR` environment variable.
+2. The **data directory** (`$DATA_DIR`) is used to store important and long-term working data (about 1 TB as a guideline).
+   It sits on a RAID-6 NAS, which is **not** a backup: keep your own copies of anything irreplaceable.
+   The path is `/data/$USER` for members, or `/data/<group>/collab/$USER` for collaborators.
 3. The **scratch directory** (`/scratch/$USER`) is used to store temporary files generated when running a job.
    This folder is stored in a physical disk on the compute nodes (unlike the HOME and data directories) so it is much faster for reading and writing files than the shared file system over the network.
    It can be referenced by the `$SCRATCH_DIR` environment variable.
@@ -103,9 +103,9 @@ Here is a summary table of the directory features:
 
 | Directory | Speed | Capacity      | Lifetime   | Backup |
 | --------- | ----- | ------------- | ---------- | :----: |
-| HOME      | slow  | 100 GB        | 6 months   |   ❌   |
-| data      | slow  | 1 TB          | Indefinite |   ✔️   |
-| scratch   | fast  | 1 TB (shared) | A week     |   ❌   |
+| HOME      | slow  | keep small    | Account    |   ❌   |
+| data      | slow  | ~1 TB         | Account    |   ❌   |
+| scratch   | fast  | ~1 TB/node    | A week     |   ❌   |
 
 Refer to the [Storage]({{< ref storage >}}) and [Best practices]({{< ref best-practices >}}) pages for more information about how to correctly use the file system.
 
@@ -265,7 +265,7 @@ Note that there are a lot of extra packages, such as the compiler libraries used
 ## Running jobs
 
 The cluster has several compute nodes aimed at running resource-intensive tasks.
-These are managed the [Slurm](https://slurm.schedmd.com/) workload manager, which takes care of allocating and scheduling the compute resources among the users.
+These are managed by the [Slurm](https://slurm.schedmd.com/) workload manager, which takes care of allocating and scheduling the compute resources among the users.
 Hence, the users must submit jobs to the compute nodes for processing via the Slurm scheduler.
 
 Job submission is commonly done in two steps:
