@@ -27,10 +27,9 @@ Replace `<username>` with your login name and `<ipaddr>` with the server's IP ad
 You will be then prompted to enter your password.
 To avoid typing your password, see [below]({{% ref "#passwordless" %}}).
 
-{{< callout type="info" >}}
-Both the login name and password will be sent to you when granted access to the LBQC server.
-See the [Accounts page]({{% ref "accounts" %}}) for details.
-{{< /callout >}}
+> [!NOTE]
+> Both the login name and password will be sent to you when granted access to the LBQC server.
+> See the [Accounts page]({{% ref "accounts" %}}) for details.
 
 The IP address is a numerical label in the format `XXX.XXX.XXX.XXX` that identifies a device connected to a computer network.
 The IP address of the LBQC server is **{{% data "server.ip" %}}**.
@@ -98,9 +97,8 @@ The Hosts file can be found at:
 - **Linux/macOS**: The hosts file is located at `/etc/hosts`.
 - **Windows**: The hosts file is located at `C:\Windows\System32\drivers\etc\hosts`.
 
-{{< callout type="warning" >}}
-You will need administrative or root privileges to edit the hosts file.
-{{< /callout >}}
+> [!WARNING]
+> You will need administrative or root privileges to edit the hosts file.
 
 The general format is:
 
@@ -213,10 +211,9 @@ Enter the following VPN settings, leave the rest as shown in the image:
 - **Port**: Default SSL VPN port is 443.
 - **Username**: Enter your username for the VPN (may not be the same as the LBQC user login).
 
-{{< callout type="info" >}}
-These settings will be sent to you when granted access to the LBQC server along the user login and password.
-See the [Accounts page]({{% ref "accounts" %}}) for details.
-{{< /callout >}}
+> [!NOTE]
+> These settings will be sent to you when granted access to the LBQC server along the user login and password.
+> See the [Accounts page]({{% ref "accounts" %}}) for details.
 
 After entering the details, click on "Save" and then "Connect".
 FortiClient will attempt to establish a secure tunnel to the server.
