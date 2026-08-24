@@ -9,9 +9,8 @@ You'll learn how to connect to the cluster, list and load modules, submit and ma
 After reading this page, you will hopefully have run your first job successfully in the cluster.
 Links are provided throughout the text to point you to more in-depth information on the topic.
 
-{{< callout type="warning" >}}
-Basic Linux and HPC knowledge is a prerequisite, which can be learned from many beginner tutorials available online.
-{{< /callout >}}
+> [!WARNING]
+> Basic Linux and HPC knowledge is a prerequisite, which can be learned from many beginner tutorials available online.
 
 ## Getting an account
 
@@ -71,11 +70,10 @@ Last login: Wed Apr 10 16:50:48 2024 from 10.212.134.55
 
 Here you can execute commands within _lbqc_ such as submitting and managing jobs.
 
-{{< callout type="warning" >}}
-**Do not run compute-intensive applications from here**.
-The login node must be only used for job-related (see below) and simple tasks.
-Bad usage will lead to account termination.
-{{< /callout >}}
+> [!WARNING]
+> **Do not run compute-intensive applications from here**.
+> The login node must be only used for job-related (see below) and simple tasks.
+> Bad usage will lead to account termination.
 
 If you want to connect from a remote location (e.g., from your computer at home), you must use a VPN connection to get access to the university's network.
 Follow the steps in the [Remote access]({{< ref "access#remote" >}}) section to install and configure the VPN in your computer.
@@ -146,10 +144,9 @@ $ scp -r <user>@{{% data "server.ip" %}}:path/to/remote-dir /path/to/local-dir
 These commands must be entered in a terminal in your local computer running a UNIX-like OS like Linux or macOS.
 It is recommended to use the [Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/install) under Windows rather than installing third-party applications, if possible.
 
-{{< callout type="warning" >}}
-The path following the colon after the remote address is relative to the HOME directory unless is prefixed by `/`, which it is treated as an absolute path instead.
-That is, `/path/to/file` points to the file at `/path/to/file`, whereas `path/to/file` points to `$HOME/path/to/file`.
-{{< /callout >}}
+> [!WARNING]
+> The path following the colon after the remote address is relative to the HOME directory unless is prefixed by `/`, which it is treated as an absolute path instead.
+> That is, `/path/to/file` points to the file at `/path/to/file`, whereas `path/to/file` points to `$HOME/path/to/file`.
 
 More information about file transfer can be found on the [File Transfer]({{< ref "storage#file-transfer" >}}) section.
 
@@ -160,7 +157,7 @@ Refer to the [SSH customization]({{< ref "access#ssh-customization" >}}) section
 
 You can use pre-installed software, build your own software, or submit a software request to get software installed by the admin team.
 Here we will focus on using pre-installed software only.
-Refer to the [Building software]({{< ref "software#building" >}}) and [Request a software]({{< ref "software#request" >}}) sections for information in these topics.
+Refer to the [Software]({{< relref "software" >}}) section for application guides, [building software]({{< relref "software#building" >}}), and [requesting a module]({{< relref "software#request" >}}).
 
 ### Finding a software package
 
@@ -204,6 +201,10 @@ Each software package is identified by its name and version separated by a slash
 Packages may also specify additional features by appending `+<feature>`.
 For instance, `md/namd/2.14+cuda` refers to the NAMD software, version 2.14, compiled with support for GPU acceleration via CUDA, under the Molecular Dynamics (`md`) category.
 The combination of the version and enabled features is referred to as a _variant_, that is, `md/namd/2.14+cuda` is a variant of `md/namd/2.14`.
+
+The listing above is an example snapshot and will change as packages are added.
+Genomics tools are under the `genom` category (`module avail genom`).
+Per-package caveats and example job scripts are in the [Software]({{< relref "software" >}}) guides ([FastQC]({{< relref "software/fastqc" >}}), [MultiQC]({{< relref "software/multiqc" >}}), [SRA Toolkit]({{< relref "software/sratoolkit" >}}), [STAR]({{< relref "software/star" >}}), [TElocal]({{< relref "software/telocal" >}}), [Trimmomatic]({{< relref "software/trimmomatic" >}})).
 
 You can pass a name to the above command to only list the matching packages (footer omitted for brevity):
 
@@ -257,12 +258,9 @@ Currently Loaded Modules:
 
 Note that there are a lot of extra packages, such as the compiler libraries used during compilation (`intel/2023.1.0`) of one or more packages, which are automatically loaded based on the dependencies specified in the corresponding modules.
 
-{{< callout type="info" >}}
-**Module scope**
-<br />
-The modules you load are only active in your current session.
-Therefore, you need to load the desired software each time you open a new session.
-{{< /callout >}}
+> [!NOTE]
+> **Module scope.** The modules you load are only active in your current session.
+> Therefore, you need to load the desired software each time you open a new session.
 
 ## Running jobs
 
@@ -279,9 +277,8 @@ A job script file is simply a Bash script with special instructions written as c
 Such instructions tell the scheduler the resources (e.g., CPUs and memory) that the job requires to be run, so it can be assigned to a compatible compute node, how long the job will run, etc.
 The body of the script consists of shell commands to be executed in order, usually setting up the environment, copying files, and running the desired software.
 
-{{< callout type="info" >}}
-Refer to tutorials on the internet for learning the basics of the Bash language.
-{{< /callout >}}
+> [!NOTE]
+> Refer to tutorials on the internet for learning the basics of the Bash language.
 
 ### Writing a job
 
