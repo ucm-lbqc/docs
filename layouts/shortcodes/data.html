@@ -1,4 +1,4 @@
-{{- $map := .Site.Data.globals -}}
+{{- $map := hugo.Data.globals -}}
 {{- $keys := split (.Get 0) "." -}}
 {{- range $i, $key := $keys -}}
   {{- if $map -}}
