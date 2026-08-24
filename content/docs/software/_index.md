@@ -71,6 +71,22 @@ Categories group related packages (`genom`, `md`, `qm`, `lang`, …). Tab-comple
 
 Details: [Storage]({{< relref "storage" >}}).
 
+## Example RNA-seq / TE workflow
+
+These tools are often used in **separate jobs**, not all loaded at once.
+A typical sequence (adjust to your protocol):
+
+1. [SRA Toolkit]({{< relref "sratoolkit" >}}) — `prefetch` + `fasterq-dump` into scratch, keep FASTQ on `$DATA_DIR` if needed.
+2. [FastQC]({{< relref "fastqc" >}}) — QC of raw reads.
+3. [Trimmomatic]({{< relref "trimmomatic" >}}) — adapters and quality.
+4. [FastQC]({{< relref "fastqc" >}}) again on trimmed reads (optional).
+5. [STAR]({{< relref "star" >}}) — build the index once on `$DATA_DIR`; map with multimappers if you will run TElocal.
+6. [TElocal]({{< relref "telocal" >}}) — counts from the BAM (download `.locInd` yourself).
+7. [MultiQC]({{< relref "multiqc" >}}) — one HTML report from FastQC/STAR logs.
+
+Each step is a `sbatch` script on the corresponding page.
+Do not chain a multi-hour STAR run and a download on the login node.
+
 ## Building software {#building}
 
 You may compile tools in your own directories (`$HOME` or `$DATA_DIR`) if they are not provided as modules.
