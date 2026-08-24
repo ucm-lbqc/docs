@@ -34,7 +34,7 @@ The storage is divided in three levels:
   - Login node OS (NVMe 512GB).
   - User directories `/home/<user>` (2x HDD 6.0TB in RAID 1) mounted via NFS.
   - Software (2x HDD 2.0TB in RAID 1) mounted via NFS.
-- **Scratch** `/scratch/<user>` directory (SSD 1TB) on compute nodes only. #text(red)[*Files last for a week*].
+- **Scratch** `/scratch/<user>` directory (SSD 1TB) on compute nodes only. Files last for a week.
 - **Data** `/data/<user>` directory hosted in a high-performance NAS QNAP TS-673A 8GB _48TB_ with RAID 6 mounted via NFS.
 
 See the [Storage]({{< ref storage >}}) page for details.
@@ -43,7 +43,7 @@ See the [Storage]({{< ref storage >}}) page for details.
 
 The following software is used for server management:
 
-- Base OS: Rocky Linux 9.3.
+- Base OS: Rocky Linux 9.5.
 - Provisioning system: Warewulf 4.5.0rc2.
 - Resource management: SLURM 22.05.11.
 - Package management: OpenHPC 3.0.0.
