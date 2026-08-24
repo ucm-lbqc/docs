@@ -33,15 +33,12 @@
       - scp
       - rsync
   - software
-    - modules
-      - Lmod
-      - List available modules
-      - Load module
-      - Unload module
-    - organization
-      - Toolchains
-      - Categories
-    - user-software
+    - FastQC
+    - MultiQC
+    - SRA Toolkit
+    - STAR
+    - TElocal
+    - Trimmomatic
   - resource-management
     - slurm
       - What is SLURM?
