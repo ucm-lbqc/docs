@@ -1,5 +1,6 @@
 - home
 - about
+- affiliation
 - team
 - docs
   - home
