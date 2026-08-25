@@ -4,143 +4,281 @@ next: job-management
 weight: 702
 ---
 
-Write a script, submit it with `sbatch`, or grab a node interactively with `salloc` / `srun`.
-The first complete tutorial is [Getting Started]({{< relref "getting-started" >}}).
+This page is the reference for **batch** jobs: a script on disk, submitted with `sbatch`, that runs unattended on a compute node.
 
-## Resource allocation
+- First job you ever submit: [Getting Started]({{< relref "getting-started" >}}).
+- Shell on a compute node for tests: [Interactive jobs]({{< relref "job-interactive" >}}) (`salloc` and `srun --pty`).
+- What partitions, time limits, and mail mean: [SLURM]({{< relref "slurm" >}}).
 
-### sbatch
+## Anatomy of a job script
 
-`sbatch script.slurm` queues a **batch** job.
-The script must start with `#!/bin/bash` and Slurm directives (`#SBATCH`).
+A job script is a normal Bash file.
+The first line tells Linux to run it with Bash.
+Lines that start with `#SBATCH` are **not** comments for Bash: Slurm reads them before the script starts and uses them to reserve resources.
+Everything after that is executed **on the compute node**, in order.
 
-Useful options:
+```bash {linenos=table, filename="example.slurm"}
+#!/bin/bash
+#SBATCH -J example
+#SBATCH -c 8
+#SBATCH --mem-per-cpu=4G
+#SBATCH -t 02:00:00
+#SBATCH -o %x-%j.out
+#SBATCH -e %x-%j.err
 
-| Option | Meaning |
-| ------ | ------- |
-| `-J name` | Job name |
-| `-c N` / `--cpus-per-task=N` | CPUs for the task |
-| `--mem=32G` | RAM (default is ~4 GB per CPU) |
-| `-t 08:00:00` | Wall time (`14-00:00:00` is the partition max) |
-| `-o %x-%j.out` | Stdout file (`%j` job id, `%x` name) |
-| `-e %x-%j.err` | Stderr file |
-| `--gpus=l4:1` | GPU type and count |
-| `--constraint=epyc-7713` | Node feature |
-| `--mail-user=` / `--mail-type=` | [Mail]({{< relref "slurm#notification-system" >}}) |
+echo "Job $SLURM_JOB_ID on $SLURM_JOB_NODELIST"
+echo "Submitted from $SLURM_SUBMIT_DIR"
+echo "CPUs: $SLURM_CPUS_PER_TASK"
 
-#### Job script
+module load gnu12
+which gcc
 
-Load modules **in the script**.
-Use `$SCRATCH_DIR` for heavy I/O.
-Exit with the application's status so Slurm records failure correctly.
+WORKDIR="$SCRATCH_DIR/$SLURM_JOB_ID"
+mkdir -p "$WORKDIR"
+cd "$WORKDIR"
 
-#### Features
+# Copy inputs from $DATA_DIR into $WORKDIR, run, copy keepers back.
+srun hostname
+```
 
-`sinfo -o '%f'` lists features (`cpu-amd`, `gpu-l4`, `xeon-silver-4216`, …).
-Combine with `--constraint=` when you need a specific ISA or GPU family.
-
-### salloc
-
-Allocates resources and **holds** them for interactive use:
+Submit it from the login node:
 
 ```console
-$ salloc -c 8 --mem=16G -t 02:00:00
+$ sbatch example.slurm
+Submitted batch job 238
 ```
 
-When the allocation starts, you get a shell **on the login node** with Slurm env vars set.
-Start work on the compute node with `srun` (see [Interactive jobs]({{< relref "job-interactive" >}})).
+What each header line does:
 
-### srun
+| Directive | Meaning |
+| --------- | ------- |
+| `-J example` | Job name (shows up in `squeue`; `%x` in filenames). |
+| `-c 8` | Eight CPUs for this task. Use this for multithreaded programs. |
+| `--mem-per-cpu=4G` | RAM **per CPU**. Here: 8 × 4 GB = 32 GB total. The cluster default is already ~4 GB per CPU; writing it down makes the request obvious. |
+| `-t 02:00:00` | Maximum wall time (2 hours). Format: `HH:MM:SS` or `days-HH:MM:SS`. Maximum is 14 days. |
+| `-o %x-%j.out` | Standard output file. `%j` is the job ID, `%x` is the job name. |
+| `-e %x-%j.err` | Standard error in a separate file. Omit `-e` to keep both streams in `-o`. |
 
-Runs a step **inside** an allocation (or creates one if you pass resource flags).
+Useful extras (not required):
 
-```console
-$ srun -c 4 -t 00:10:00 hostname
-```
+| Directive | Meaning |
+| --------- | ------- |
+| `--gpus=l4:1` | One GPU of type `l4` (see [GPUs](#gpus)). |
+| `--constraint=cpu-amd` | Only nodes tagged with that [feature](#features). |
+| `--mail-user=` / `--mail-type=` | [Email]({{< relref "slurm#notification-system" >}}). |
 
-Inside a batch script, `srun ./app` is the right way to launch MPI.
+## Launching the program with `srun` {#srun}
 
-## Parallel jobs
+In a **batch** script the commands already run on the allocated compute node.
+`echo`, `module load`, `cp`, and `cd` can stay as ordinary shell commands.
 
-> [!WARNING]
-> **One node.** MPI ranks must fit on a single machine (up to 128 cores on rose/maria).
-> Multi-node `mpirun` will not get a second node.
-
-### Affinity
-
-Hyper-threading is disabled. Bind MPI to cores:
+The **application itself** should be started with `srun`.
+That creates a Slurm *job step*: the scheduler then knows which process is the workload, can bind it to the reserved cores, and can run MPI correctly.
 
 ```bash
-srun --cpu-bind=cores -n 16 ./mpi_app
+module load gnu12 openmpi4
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+srun ./my_program arg1 arg2
 ```
 
-### OpenMP
+For MPI, `srun` replaces `mpirun` / `mpiexec` on this cluster:
 
 ```bash
-#SBATCH -c 16
+#SBATCH -n 32
+#SBATCH --mem-per-cpu=4G
+module load gnu12 openmpi4
+srun --cpu-bind=cores ./mpi_app
+```
+
+`-n` is the number of MPI ranks (tasks).
+Keep `n` (or `n × cpus-per-task`) within **one** node (at most 128 cores).
+
+> [!NOTE]
+> Do not type `srun -c 8 ./app` on the login node as a substitute for `sbatch`.
+> That form **creates a new allocation** and is an interactive shortcut; it belongs on [Interactive jobs]({{< relref "job-interactive" >}}).
+> Inside a script that you already submitted with `sbatch`, write `srun ./app` (the resources are already reserved).
+
+If the program must run in the background so the script can catch a time-limit signal, the pattern is `srun ... &` then `wait`, as in the GROMACS example in [Getting Started]({{< relref "getting-started" >}}).
+
+## Resource options in more detail
+
+### CPUs: `-c` vs `-n`
+
+- `#SBATCH -c 8` (same as `--cpus-per-task=8`): one task, eight cores. Typical for OpenMP or a program with a `--threads` flag.
+- `#SBATCH -n 16` (same as `--ntasks=16`): sixteen tasks, one core each unless you also set `-c`. Typical for MPI.
+
+You can combine them (`-n 4 -c 8` is 4 ranks × 8 threads = 32 cores), still on a **single** node.
+
+Tell the program about the reservation:
+
+```bash
+#SBATCH -c 8
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ```
 
-Do not let the runtime see all 128 cores of rose if you only reserved 8.
+If you do not, many codes will see every core on the node and oversubscribe it.
 
-## GPUs
+### Memory: `--mem-per-cpu`
 
-| Node | GRES |
-| ---- | ---- |
+Prefer **memory per CPU**, which scales when you change `-c`:
+
+```bash
+#SBATCH -c 8
+#SBATCH --mem-per-cpu=4G    # 32 GB total
+```
+
+```bash
+#SBATCH -c 8
+#SBATCH --mem-per-cpu=8G    # 64 GB total, for a memory-heavy run
+```
+
+`--mem=32G` is the older “total RAM” form.
+It does not change when you edit `-c`, so it is easier to get wrong.
+Use `--mem-per-cpu` unless you have a reason not to.
+
+If the job is killed with `OUT_OF_MEMORY`, raise `--mem-per-cpu` or reduce the problem size.
+`sacct` reports `MaxRSS` after the job ends ([Job management]({{< relref "job-management" >}})).
+
+### Time, output files, working directory
+
+`-t` is a **limit**, not an estimate that the job will take that long.
+The script’s current directory at start is the directory where you ran `sbatch` (`$SLURM_SUBMIT_DIR`).
+That is usually HOME, which is slow.
+Create a directory on scratch, `cd` there, then copy results back (see the example at the top of this page).
+
+## Features and `--constraint` {#features}
+
+Each node carries **tags** (features): CPU vendor, CPU model, GPU family, and so on.
+They let you request a *kind* of machine without naming `rose` or `sina`.
+
+Most jobs should **not** set `--constraint`.
+Slurm already picks a node that has enough CPUs, memory, and GPUs.
+Add a constraint only when the program requires it (a binary that only runs on AMD, or a GPU model).
+
+List what is installed:
+
+```console
+$ sinfo -N -o '%N %c %m %G %f'
+NODELIST   CPUS MEMORY    GRES                           AVAIL_FEATURES
+nc01         32 257574    (null)                         cpu-intel,cpu-cascade-lake,cpu-xeon,xeon-silver-4216
+nc05         64 515400    (null)                         cpu-amd,cpu-zen4,cpu-epyc,epyc-9534,mem512
+maria       128 322215    (null)                         cpu-amd,cpu-zen3,cpu-epyc,epyc-7713,mem320
+rose        128 483481    (null)                         cpu-amd,cpu-zen3,cpu-epyc,epyc-7713,mem512
+sina         40 514469    gpu:l4:2                       cpu-intel,...,gpu,gpu-l4
+vision       24  57344    gpu:2080ti:2,gpu:3090:1        cpu-intel,...,gpu-2080ti,gpu-3090
+wc01         16 128439    gpu:2080ti:1,gpu:2080super:1   cpu-intel,...,gpu-2080ti,gpu-2080super
+```
+
+(The listing is shortened; run the command for the live list.)
+
+Examples:
+
+```bash
+# Only AMD CPUs (nc05, maria, rose)
+#SBATCH --constraint=cpu-amd
+
+# The large EPYC 7713 nodes (maria, rose)
+#SBATCH --constraint=epyc-7713
+```
+
+`--constraint` is an extra filter on top of CPUs/memory/GPUs.
+Impossible combinations never start, for example `--gpus=l4:1` together with `--constraint=epyc-7713` (`sina` has the L4, the EPYC nodes do not).
+The error looks like `Requested node configuration is not available`.
+
+For GPUs, prefer `--gpus=` (below) over a GPU feature tag.
+`--gpus=l4:1` already implies a node that has that device.
+
+## GPUs {#gpus}
+
+Only three nodes have GPUs:
+
+| Node | What Slurm calls the devices |
+| ---- | ---------------------------- |
 | sina | `gpu:l4:2` |
 | vision | `gpu:2080ti:2,gpu:3090:1` |
 | wc01 | `gpu:2080ti:1,gpu:2080super:1` |
 
 ```bash
-#SBATCH --gpus=l4:1
-#SBATCH --gpus=2080ti:1
-#SBATCH --gpus=1
+#SBATCH --gpus=l4:1          # one NVIDIA L4 (sina)
+#SBATCH --gpus=2080ti:1      # one RTX 2080 Ti (vision or wc01)
+#SBATCH --gpus=1             # whatever is free (can be much slower)
 ```
 
-The last form takes any free GPU.
-CUDA modules: `module load cuda` (and the application module).
+Load CUDA as well as the application module (`module load cuda` is often pulled in by the app module).
+A complete GPU batch script, including scratch and a time-limit trap, is the GROMACS example in [Getting Started]({{< relref "getting-started" >}}).
 
 ## Environment variables
 
-Slurm sets (among others):
+Slurm sets these in the script (among others):
 
 | Variable | Content |
 | -------- | ------- |
-| `$SLURM_JOB_ID` | Job id |
-| `$SLURM_JOB_NAME` | Name |
+| `$SLURM_JOB_ID` | Numeric job id |
+| `$SLURM_JOB_NAME` | Name from `-J` |
 | `$SLURM_CPUS_PER_TASK` | CPUs from `-c` |
-| `$SLURM_JOB_NODELIST` | Node |
+| `$SLURM_NPROCS` / `$SLURM_NTASKS` | Task count from `-n` |
+| `$SLURM_JOB_NODELIST` | Compute node hostname |
 | `$SLURM_SUBMIT_DIR` | Directory where you ran `sbatch` |
-| `$SLURM_GPUS_ON_NODE` | GPUs on the node (if any) |
+| `$SLURM_GPUS_ON_NODE` | GPUs on the node, if any |
 
-`$DATA_DIR` and `$SCRATCH_DIR` come from the cluster login environment, not Slurm; they are still set in batch jobs.
+`$DATA_DIR` and `$SCRATCH_DIR` come from the cluster login environment, not from Slurm; they are still set in batch jobs.
 
-## Examples
+## Complete examples
 
-### Serial / multithreaded CPU
+### Multithreaded CPU program
 
-See the genomics scripts under [Software]({{< relref "software" >}}) (FastQC, STAR, TElocal).
-Typical header:
-
-```bash
-#SBATCH -J star-align
+```bash {filename="threads.slurm"}
+#!/bin/bash
+#SBATCH -J threads
 #SBATCH -c 16
-#SBATCH --mem=32G
+#SBATCH --mem-per-cpu=4G
 #SBATCH -t 08:00:00
+#SBATCH -o %x-%j.out
+
+module load gnu12
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+WORKDIR="$SCRATCH_DIR/$SLURM_JOB_ID"
+mkdir -p "$WORKDIR"
+cd "$WORKDIR"
+cp "$DATA_DIR"/inputs/data.bin .
+
+srun ./my_openmp_app data.bin
+
+cp -a results/ "$DATA_DIR"/results/"$SLURM_JOB_ID"/
 ```
 
-### MPI
+Application-specific scripts (quality control, aligners, and so on) live under [Software]({{< relref "software" >}}).
 
-```bash
+### MPI on one node
+
+```bash {filename="mpi.slurm"}
+#!/bin/bash
+#SBATCH -J mpi-app
 #SBATCH -n 32
-#SBATCH --mem=64G
+#SBATCH --mem-per-cpu=4G
 #SBATCH -t 12:00:00
+#SBATCH -o %x-%j.out
+
 module load gnu12 openmpi4
 srun --cpu-bind=cores ./mpi_app
 ```
 
-Keep `-n` ≤ cores on one node.
+Keep `-n` ≤ cores on the node you will land on (32 fits on `nc01`–`nc04`; 128 is the ceiling on `rose`/`maria`).
 
 ### GPU
 
-The GROMACS walk-through in [Getting Started]({{< relref "getting-started" >}}) (`--gpus=2080ti:1`, scratch, `USR1` trap) is the reference GPU batch script.
+```bash {filename="gpu.slurm"}
+#!/bin/bash
+#SBATCH -J gpu-app
+#SBATCH -c 8
+#SBATCH --mem-per-cpu=4G
+#SBATCH --gpus=2080ti:1
+#SBATCH -t 12:00:00
+#SBATCH -o %x-%j.out
+
+module load cuda
+srun ./my_gpu_app
+```
+
+If performance depends on the GPU model, do not use `--gpus=1`.
