@@ -9,12 +9,35 @@
   - access
   - storage
   - software
+    - Amber
+    - BWA
+    - CHARMM
+    - DFTB+
+    - Desmond
     - FastQC
+    - GATK
+    - GROMACS
+    - JDFTx
+    - LAMMPS
     - MultiQC
+    - Multiwfn
+    - NAMD
+    - Open Babel
+    - OpenMM
+    - ORCA
+    - PLUMED
+    - Q-Chem
     - SRA Toolkit
     - STAR
+    - Schrödinger
+    - samtools
+    - SnpEff
+    - Softepigen
     - TElocal
     - Trimmomatic
+    - VASP
+    - VMD
+    - xTB
   - resource-management
     - slurm
     - job-submission
