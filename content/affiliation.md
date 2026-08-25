@@ -8,22 +8,20 @@ The LBQC affiliation is **only for members** of the laboratory ([Team]({{< relre
 Collaborators and external collaborators must **not** list the LBQC.
 
 For members, the LBQC line is **secondary**.
-Write your primary appointment first (department, faculty, or centre), then add the laboratory.
+Write your primary appointment first (department, faculty, or centre), then add the laboratory:
+
+> Laboratorio de Bioinformática y Química Computacional (LBQC), Departamento de Medicina Traslacional, Facultad de Medicina, Universidad Católica del Maule (UCM), Talca, Chile
 
 Do not translate unit names. Use the official Spanish names even in an English manuscript.
-
-## Laboratory line
-
-> Laboratorio de Bioinformática y Química Computacional (LBQC), Departamento de Medicina Traslacional, Facultad de Medicina, Universidad Católica del Maule, Talca, Chile
 
 City and postcode when a journal asks for them: Talca 3480094, Chile.
 Campus: San Miguel.
 
-## Acknowledgements (cluster)
+## Acknowledgements
 
-If the work used the LBQC cluster, acknowledge compute time only. Do not list hardware funding here.
+If you used the laboratory’s computers, please acknowledge that in the paper (acknowledgements or equivalent section):
 
-> Computations were performed on the LBQC cluster at Universidad Católica del Maule.
+> The authors acknowledge the use of the computational resources of the Laboratorio de Bioinformática y Química Computacional (LBQC), Universidad Católica del Maule (UCM), Chile.
 
 ## Who is who
 
