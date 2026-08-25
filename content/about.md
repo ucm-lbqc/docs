@@ -4,7 +4,7 @@ next: affiliation
 ---
 
 The **Laboratorio de Bioinformática y Química Computacional (LBQC)** is a research laboratory at [Universidad Católica del Maule](https://www.ucm.cl) (UCM) in Talca, Chile.
-It belongs to the [Department of Translational Medicine](https://www.ucm.cl/facultades/facultad-de-medicina/departamentos/) (*Departamento de Medicina Traslacional*), Faculty of Medicine.
+It belongs to the [Departamento de Medicina Traslacional](https://www.ucm.cl/facultades/facultad-de-medicina/departamentos/), Facultad de Medicina.
 Several members are also researchers at the [Centro de Investigación de Estudios Avanzados del Maule (CIEAM)](https://www.ucm.cl/ciencia-e-investigacion/comunidad-creacion-y-desarrollo/centros-de-investigacion/cieam/).
 
 The laboratory was established in 2022.
