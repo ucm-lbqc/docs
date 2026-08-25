@@ -18,7 +18,7 @@ $ module load genom/star
 ## Memory and indices
 
 Mammalian genomes need about **32 GB of RAM** for mapping; building the index can need more.
-Request memory explicitly in Slurm (`#SBATCH --mem=32G` or higher).
+Request it with `--mem-per-cpu` (the cluster default is ~4 GB per CPU).
 
 Store the genome index in **`$DATA_DIR`**. Scratch is wiped after a week and regenerating an index is expensive.
 
@@ -28,7 +28,7 @@ Store the genome index in **`$DATA_DIR`**. Scratch is wiped after a week and reg
 #!/bin/bash
 #SBATCH -J star-index
 #SBATCH -c 16
-#SBATCH --mem=48G
+#SBATCH --mem-per-cpu=4G
 #SBATCH -t 06:00:00
 #SBATCH -o %x-%j.out
 
@@ -46,7 +46,7 @@ STAR --runThreadN "$SLURM_CPUS_PER_TASK" \
 #!/bin/bash
 #SBATCH -J star-align
 #SBATCH -c 16
-#SBATCH --mem=32G
+#SBATCH --mem-per-cpu=4G
 #SBATCH -t 08:00:00
 #SBATCH -o %x-%j.out
 

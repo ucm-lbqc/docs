@@ -37,7 +37,7 @@ Otherwise the BAM must be unsorted or sorted by query name.
 #!/bin/bash
 #SBATCH -J telocal
 #SBATCH -c 8
-#SBATCH --mem=32G
+#SBATCH --mem-per-cpu=4G
 #SBATCH -t 12:00:00
 #SBATCH -o %x-%j.out
 
