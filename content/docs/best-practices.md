@@ -5,67 +5,100 @@ next: troubleshooting
 weight: 800
 ---
 
-Short rules that keep the cluster usable for everyone.
+These habits keep the cluster usable for everyone.
+They are the same ideas as in [Getting Started]({{< relref "getting-started" >}}), written as rules you can check before you submit.
 
-## Login node
+## Stay off the login node for heavy work
 
-The login node is for SSH, editing, `sbatch`/`squeue`, and small file copies.
-Compiling STAR-sized projects, `fasterq-dump`, FastQC over many samples, or `gmx mdrun` here can get your account disabled.
+The login node (`lbqc`) is a shared front door: SSH, editors, `sbatch`, `squeue`, and small file copies.
+
+Do **not** run there:
+
+- Analyses or simulations (anything that would take minutes on a laptop, or that uses many CPU cores)
+- Compiling large packages
+- Downloading or unpacking large datasets
+- Anything that saturates disk or network for a long time
+
+Those tasks belong in a Slurm job on a compute node.
+Misuse of the login node can get the account disabled.
 
 ## One node per job
 
-The `normal` partition has `MaxNodes=1`.
-Do not request MPI across several nodes; it will not be scheduled.
-Use several CPUs on **one** node (`#SBATCH -c` or `--ntasks` on that node) or submit independent jobs.
+The default partition allows **one machine per job**.
+You can use many cores on that machine, but you cannot split one job across `rose` and `maria`.
 
-## Memory
+If you need more work done, submit several independent jobs (one sample, one simulation, one parameter set each), or use the cores of a single large node (up to 128).
 
-Default memory is about **4 GB per CPU** (`DefMemPerCPU`).
-STAR and TElocal need much more: set `#SBATCH --mem=32G` (or higher) explicitly.
-If you omit `--mem` and take 16 CPUs, you already get a large allocation; do not also oversubscribe the node with OpenMP threads beyond `$SLURM_CPUS_PER_TASK`.
+## Ask for memory per CPU
 
-## Scratch vs data
+By default the cluster gives about **4 GB of RAM per reserved CPU**.
+You almost always want to set this explicitly with `--mem-per-cpu` so it is visible in the script:
 
-- Stage big I/O in `$SCRATCH_DIR`.
-- Keep genomes, indices, and final results in `$DATA_DIR`.
-- Copy back **before** scratch is wiped (one week).
-- RAID is not a backup ([Storage]({{< relref "storage" >}})).
+```bash
+#SBATCH -c 8
+#SBATCH --mem-per-cpu=4G
+```
 
-## Modules belong in the job script
+That example reserves 8 CPUs and 32 GB in total (8 × 4 GB).
+Increase `--mem-per-cpu` if the program is memory-hungry (genome indexing, large molecular systems, big matrices).
+If you omit it, you still get the 4 GB-per-CPU default, but the script is harder to read and to debug.
 
-`module load` in an interactive SSH session does not apply to `sbatch` jobs.
-Load modules in the script (or in `salloc` after the allocation starts).
+Do not start more threads than the CPUs you reserved: see below.
 
-## Threads and Java
+## Work on scratch, keep results on data
 
-Pin thread counts to the allocation:
+| Put here | Typical contents |
+| -------- | ---------------- |
+| `$SCRATCH_DIR` | Temporary files, working directories, anything the job only needs while it runs |
+| `$DATA_DIR` | Inputs you will reuse, and outputs you must keep |
+| `$HOME` | Scripts and configuration, not datasets |
+
+Copy keepers **before** the job ends: scratch is wiped after a week of inactivity.
+RAID on the NAS is not a backup ([Storage]({{< relref "storage" >}})).
+
+## Load modules inside the job
+
+`module load` in your SSH session does **not** apply to a job you submit later with `sbatch`.
+Put every `module load` in the job script (or after an interactive allocation has started).
+
+## Tell the program how many CPUs it may use
+
+You reserved cores with `#SBATCH -c`. The program does not guess that number by itself.
+Many tools will try to use every core they see on the node (for example 128 on `rose`) even if you only asked for 8.
 
 ```bash
 #SBATCH -c 8
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ```
 
-For Trimmomatic, also set `-threads "$SLURM_CPUS_PER_TASK"` and `MALLOC_ARENA_MAX=2` ([Trimmomatic]({{< relref "trimmomatic" >}})).
+`$SLURM_CPUS_PER_TASK` is set by Slurm to the value of `-c`.
+Pass the same number to the application if it has its own `--threads` / `-nt` flag.
 
-## GPUs
+Some Java programs also need `export MALLOC_ARENA_MAX=2` so they do not reserve a huge amount of virtual memory per thread. See [Troubleshooting]({{< relref "troubleshooting" >}}).
 
-Ask for a type if the code cares (`--gpus=l4:1` vs `--gpus=2080ti:1`).
-`--gpus=1` takes whichever GPU is free and may be much slower.
-GPU nodes are `wc01`, `sina`, and `vision` ([Cluster]({{< relref "cluster" >}})).
+## Request a GPU type when it matters
 
-## Time limits
+`--gpus=1` takes whichever GPU is free.
+A data-center GPU and a gaming GPU are not interchangeable: the job can be much slower, or the software may refuse to start.
 
-Set `-t` to a realistic upper bound.
+If you care about the model, ask for it (`--gpus=l4:1` or `--gpus=2080ti:1`).
+GPUs exist only on `wc01`, `sina`, and `vision` ([Cluster]({{< relref "cluster" >}})).
+
+## Set a realistic time limit
+
+`-t` is the **maximum** the job is allowed to run, not a prediction that it will take that long.
 The partition allows up to **14 days**.
-Shorter limits start sooner when the cluster is busy.
-For graceful shutdown, see the GROMACS example in [Getting Started]({{< relref "getting-started" >}}) (`--signal=B:USR1`).
+Shorter limits usually start sooner when the cluster is busy, and they free the node if the job hangs.
 
-## Bind MPI ranks to cores
+If the program can save a checkpoint, you can catch the time-limit signal and copy files back; the GROMACS script in [Getting Started]({{< relref "getting-started" >}}) shows the pattern (`--signal=B:USR1`).
 
-On this cluster HT is disabled; bind to cores:
+## Pin MPI processes to cores
+
+Hyper-threading is disabled on this cluster: each reserved CPU is a real core.
+If you run an MPI program, bind ranks to cores so they do not migrate:
 
 ```bash
 srun --cpu-bind=cores ./my_mpi_app
 ```
 
-VASP in particular is slow if ranks float across cores.
+Without binding, some codes spend a lot of time moving between cores and run much slower.
